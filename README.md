@@ -47,8 +47,8 @@ Follow these steps to run the medical image classification application:
 1.  **Clone the Repository:**
 
     ```bash
-    git clone <your_repository_url>
-    cd medical-image-classification
+       git clone [https://github.com/Rohitjanardhan21/Medical-Image-Classification.git]
+       cd medical-image-classification
     ```
 
 2.  **Install Dependencies:** It is recommended to use a virtual environment.
