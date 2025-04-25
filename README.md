@@ -11,6 +11,7 @@ This project is a medical image classification system that uses deep learning to
 * **Diagnosis Output:** Provides a diagnosis of the detected condition.
 * **Recommendation of Next Steps:** Suggests potential next steps or actions based on the diagnosis.
 * **Web Interface:** User-friendly web interface for uploading images and viewing results.
+* **CLI Inference:** Option to run inference from the command line.
 
 ## Project Structure and File Description
 
@@ -63,7 +64,7 @@ Follow these steps to run the medical image classification application:
 
 3.  **Prepare the Dataset:**
 
-    * Download or obtain your medical image dataset. The dataset should be organized into directories, with each directory representing a different disease class (e.g., `COVID-CT`, `COVID-XRay`, `Pneumonia-Bacterial`, `Pneumonia-Viral`, and `Normal`).
+    * Download or obtain your medical image dataset. You can download a dataset from online sources like Kaggle, or create your own. The dataset should be organized into directories, with each directory representing a different disease class (e.g., `COVID-CT`, `COVID-XRay`, `Pneumonia-Bacterial`, `Pneumonia-Viral`, and `Normal`).
     * Modify the `DATA_DIR` variable in `train_model.py` to point to the location of your dataset.
     * Ensure that the data loading and preprocessing steps in `train_model.py` and `prediction.py` are consistent with your dataset structure.
 
@@ -96,6 +97,18 @@ Follow these steps to run the medical image classification application:
     * Click the "Classify Image" button to upload and process the image.
     * The application will display the uploaded image, the diagnosis, confidence score, and recommended next steps.
 
+7.  **Run inference from command line:**
+
+    * You can also run the model directly from your system's command line. This is useful for testing or for integration with other scripts.
+    * To do this, use the `prediction.py` script:
+
+        ```bash
+        python utils/prediction.py
+        ```
+
+        * The script will then prompt you to select an image file, and will display the prediction results in your terminal.
+        * Ensure that you have a trained model saved as `medical_image_classifier.h5` in the `saved_models` directory. If you have saved it with a different name or location, you will need to modify the `MODEL_PATH` variable in `prediction.py`.
+
 ##  `requirements.txt`
 
 ```text
@@ -104,4 +117,10 @@ Flask==2.3.2
 opencv-python==4.9.0.54
 scikit-learn==1.2.2
 Werkzeug==3.0.1
-Model
+```
+## Disclaimer
+
+**Important:**
+ This application is intended for informational and educational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment.  Always consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health or treatment.  This is a learning model and project and should not be relied upon to make medical decisions until it has been extensively developed, validated, and approved for clinical use.
+
+
