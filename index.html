@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Image Classification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 95%;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        form {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background-color: #fff;
+            border: 2px solid #3498db;
+            border-radius: 30px;
+            padding: 12px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: fit-content;
+            box-sizing: border-box;
+        }
+
+        .file-upload-wrapper:hover {
+            background-color: #ecf0f1;
+        }
+
+        .file-upload-text {
+            font-size: 18px;
+            color: #3498db;
+            margin-right: 15px;
+        }
+
+        .file-upload-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 18px;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #27ae60;
+        }
+
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #results img {
+            width: 600px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+        }
+
+        #results img:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #results h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        #results p {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        #results button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 350px;
+            box-sizing: border-box;
+        }
+
+        #results button:hover {
+            background-color: #2980b9;
+        }
+
+        .recommendation-popup {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            text-align: center;
+            display: none;
+            max-width: 90%;
+            width: auto;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+            cursor: move;
+        }
+
+        .recommendation-popup h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .recommendation-popup p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            text-align: left;
+            color: #555;
+        }
+
+        .recommendation-popup button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: auto;
+            min-width: 150px;
+            box-sizing: border-box;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .recommendation-popup button:hover {
+            background-color: #45a049;
+        }
+
+        .recommendation-popup {
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e0e0e0;
+            background-color: #f8f8f8;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .recommendation-popup h2 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 0.75em;
+            font-weight: 600;
+        }
+
+        .recommendation-popup p {
+            color: #555;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 1.25em;
+            text-align: left;
+        }
+
+        .recommendation-popup button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.75em 1.5em;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1em;
+            min-width: 120px;
+        }
+
+        .recommendation-popup button:hover {
+            background-color: #217dbb;
+        }
+
+        #risk-high {
+            color: #2ecc71;
+        }
+
+        #risk-moderate {
+            color: #f1c40f;
+        }
+
+        #risk-low {
+            color: #e74c3c;
+        }
+
+        #description {
+            text-align: left;
+        }
+
+        .zoomed-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 11;
+            display: none;
+        }
+
+        .zoomed-image-container {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .zoomed-image {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 12;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .close-button:hover {
+            opacity: 1;
+        }
+
+        .diagnosis-popup {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            visibility: hidden;
+        }
+
+        .diagnosis-popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* New styles for probability chart */
+        .probability-chart {
+            margin: 20px auto;
+            max-width: 100%;
+        }
+
+        .probability-bars {
+            margin: 25px auto;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .disease-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .progress {
+            height: 25px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 5px;
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-bar.active {
+            background-color: #2ecc71;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medical Image Classification</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div class="file-upload-wrapper">
+                <span class="file-upload-text">Choose File</span>
+                <span class="file-upload-button">Browse</span>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+            <button type="submit">Classify Image</button>
+        </form>
+
+        <div id="results" {% if show_results %} style="display: block;" {% endif %}>
+            <h2>Prediction Results</h2>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <img id="uploaded-image" src="{{ image_path }}" alt="Uploaded Image">
+                <div id="diagnosis-popup" class="diagnosis-popup"></div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+                    <p>Diagnosis: <span id="diagnosis">{{ prediction }}</span></p>
+                    <p>Confidence: <span id="confidence">{{ confidence }}%</span></p>
+                    <p>Risk Level: <span id="risk-level"></span></p>
+                    <p>Description: <span id="description">{{ description }}</span></p>
+                </div>
+            </div>
+
+            {% if probability_chart %}
+            <div class="probability-chart">
+                <h3>Disease Probability Distribution</h3>
+                <img src="data:image/png;base64,{{ probability_chart }}" alt="Disease Probability Chart" class="img-fluid">
+            </div>
+            {% endif %}
+
+            <div class="probability-bars">
+                <h3>Probability Analysis</h3>
+                <div id="probability-bars-container">
+                    </div>
+            </div>
+
+            <button id="recommendation-button" style="margin-top: 25px;">Show Recommendations</button>
+        </div>
+
+        <div id="recommendation-popup" class="recommendation-popup">
+            <h2>Recommended Next Steps</h2>
+            <p id="recommendation-text"></p>
+            <button id="close-recommendation-button">Close</button>
+        </div>
+
+        <div class="zoomed-overlay">
+            <div class="zoomed-image-container">
+                <img class="zoomed-image" src="">
+                <span class="close-button">&times;</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        const recommendationPopup = document.getElementById('recommendation-popup');
+        const recommendationButton = document.getElementById('recommendation-button');
+        const closeRecommendationButton = document.getElementById('close-recommendation-button');
+        const uploadedImage = document.getElementById('uploaded-image');
+        const diagnosisSpan = document.getElementById('diagnosis');
+        const confidenceSpan = document.getElementById('confidence');
+        const riskLevelSpan = document.getElementById('risk-level');
+        const descriptionSpan = document.getElementById('description');
+        const fileInput = document.querySelector('input[type="file"]');
+        const fileUploadWrapper = document.querySelector('.file-upload-wrapper');
+        const fileUploadTextSpan = document.querySelector('.file-upload-text');
+        const probabilityBarsContainer = document.getElementById('probability-bars-container');
+        let recommendationText;
+
+        const zoomedOverlay = document.querySelector('.zoomed-overlay');
+        const zoomedImage = document.querySelector('.zoomed-image');
+        const closeButton = document.querySelector('.close-button');
+        const diagnosisPopup = document.getElementById('diagnosis-popup');
+
+
+        // Event listener for file input change
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                fileUploadTextSpan.textContent = this.files[0].name;
+            } else {
+                fileUploadTextSpan.textContent = 'Choose File';
+            }
+        });
+
+        if (resultsDiv.style.display === 'none') {
+            resultsDiv.style.display = 'none';
+        }
+
+        // Display recommendation popup
+        recommendationButton.addEventListener('click', function() {
+            recommendationPopup.style.display = 'block';
+        });
+
+        // Close recommendation popup
+        closeRecommendationButton.addEventListener('click', function() {
+            recommendationPopup.style.display = 'none';
+        });
+
+        // Image zoom functionality
+        uploadedImage.addEventListener('click', function() {
+            zoomedImage.src = this.src;
+            zoomedOverlay.style.display = 'flex';
+            diagnosisPopup.classList.add('show');
+        });
+
+        closeButton.addEventListener('click', function() {
+            zoomedOverlay.style.display = 'none';
+            diagnosisPopup.classList.remove('show');
+        });
+
+        zoomedOverlay.addEventListener('click', function(event) {
+            if (event.target === this) {
+                zoomedOverlay.style.display = 'none';
+                diagnosisPopup.classList.remove('show');
+            }
+        });
+
+
+// Get data from backend and display
+window.onload = function() {
+    const data = {
+        diagnosis: diagnosisSpan.textContent,
+        confidence: confidenceSpan.textContent.replace('%', ''),
+        imagePath: uploadedImage.getAttribute('src'),
+        description: descriptionSpan.textContent,
+        // New: Get disease probabilities if available
+        allProbabilities: {{ all_probabilities|tojson if all_probabilities else '{}' }}
+    };
+
+    const classNames = ['COVID-CT', 'COVID-XRay', 'Pneumonia-Bacterial', 'Pneumonia-Viral', 'Tuberculosis'];
+
+    const descriptions = {
+        "COVID-CT": "COVID-19 detected in CT scan. Shows characteristic ground-glass opacities in lungs.",
+        "COVID-XRay": "COVID-19 detected in X-Ray. Shows bilateral infiltrates often in lower zones.",
+        "Pneumonia-Bacterial": "Bacterial pneumonia shows as dense consolidation often in one lobe.",
+        "Pneumonia-Viral": "Viral pneumonia typically presents with diffuse interstitial patterns.",
+        "Tuberculosis": "Tuberculosis often shows upper lobe infiltrates and cavitation."
+    };
+
+    const recommendations = {
+        "COVID-CT": "Isolate patient, monitor oxygen saturation, consider antiviral therapy if eligible.",
+        "COVID-XRay": "Isolate patient, monitor vital signs, provide supportive care.",
+        "Pneumonia-Bacterial": "Prescribe appropriate antibiotics, supportive care, follow-up imaging in 4-6 weeks.",
+        "Pneumonia-Viral": "Supportive care, monitor for secondary bacterial infection, rest and hydration.",
+        "Tuberculosis": "Isolation, full TB workup, initiate anti-TB therapy as appropriate."
+    };
+
+    if (data.imagePath && data.imagePath != "None") {
+        uploadedImage.src = data.imagePath;
+        resultsDiv.style.display = 'flex';
+        diagnosisSpan.textContent = data.diagnosis;
+        confidenceSpan.textContent = data.confidence + "%";
+        descriptionSpan.textContent = descriptions[data.diagnosis] || "No description available.";
+
+        // Risk level display
+        let riskLevel = "";
+        let riskColor = "";
+        if (data.confidence > 85) {
+            riskLevel = "High confidence in diagnosis";
+            riskColor = "risk-high";
+        } else if (data.confidence > 60) {
+            riskLevel = "Moderate confidence in diagnosis";
+            riskColor = "risk-moderate";
+        } else {
+            riskLevel = "Low confidence in diagnosis, recommend further testing";
+            riskColor = "risk-low";
+        }
+        riskLevelSpan.textContent = riskLevel;
+        riskLevelSpan.className = riskColor;
+
+        // Set recommendation text
+        recommendationText = document.getElementById('recommendation-text');
+        recommendationText.textContent = recommendations[data.diagnosis] || "No specific recommendations available.";
+
+        // Display diagnosis popup
+        diagnosisPopup.textContent = "Diagnosis: " + data.diagnosis;
+
+        // Create probability bars
+        if (data.allProbabilities && Object.keys(data.allProbabilities).length > 0) {
+            probabilityBarsContainer.innerHTML = ''; // Clear existing bars
+
+            // Sort probabilities from highest to lowest
+            const sortedProbabilities = Object.entries(data.allProbabilities)
+                .sort((a, b) => b[1] - a[1]);
+
+            sortedProbabilities.forEach(([disease, probability]) => {
+                const isActive = disease === data.diagnosis;
+
+                // Create disease label div
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'disease-label';
+                labelDiv.innerHTML = `<span>${disease}</span><span>${probability.toFixed(2)}%</span>`;
+
+                // Create progress bar
+                const progressDiv = document.createElement('div');
+                progressDiv.className = 'progress';
+
+                const progressBar = document.createElement('div');
+                progressBar.className = isActive ? 'progress-bar active' : 'progress-bar';
+                progressBar.style.width = probability + '%';
+
+                // Append elements
+                progressDiv.appendChild(progressBar);
+                probabilityBarsContainer.appendChild(labelDiv);
+                probabilityBarsContainer.appendChild(progressDiv);
+            });
+        }
+    }
+}
+        // Make the recommendation popup draggable
+        let isDragging = false;
+        let startX, startY;
+
+        recommendationPopup.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - recommendationPopup.offsetLeft;
+            startY = e.clientY - recommendationPopup.offsetTop;
+            recommendationPopup.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            recommendationPopup.style.left = e.clientX - startX + 'px';
+            recommendationPopup.style.top = e.clientY - startY + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            recommendationPopup.style.cursor = 'move';
+        });
+
+        // Prevent text selection while dragging
+        recommendationPopup.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+        });
+
+    </script>
+</body>
+</html>
